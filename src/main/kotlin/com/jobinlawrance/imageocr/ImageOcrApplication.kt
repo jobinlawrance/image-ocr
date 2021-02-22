@@ -30,11 +30,13 @@ class ImageOcrApplication {
     @GetMapping("/ocr/printedText")
     suspend fun ocr(@RequestParam imageUrl: String): String {
         val client = HttpClient(CIO)
-        val file = File("${Paths.get("").toAbsolutePath()}/${imageUrl.substring(imageUrl.lastIndexOf("/") + 1)}")
+        val cwd = Paths.get("").toAbsolutePath()
+        val imageName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1)
+        val file = File("$cwd/$imageName")
         val tesserract = Tesseract()
         return withContext(Dispatchers.Default) {
             client.downloadFile(file, imageUrl)
-            tesserract.setDatapath("C:/Users/jobin/Downloads/tesdata")
+            tesserract.setDatapath("$cwd/tesdata")
             try {
                 tesserract.doOCR(file) ?: ""
             } catch (e: Exception) {
